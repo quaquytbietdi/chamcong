@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Chip tóm tắt dùng cho 3 khối: Đúng giờ / Đi muộn / Vắng mặt trên màn Admin.
+  Set màu nền + màu chữ bằng code tuỳ theo loại (success/warning/error),
+  hoặc tạo 3 biến thể riêng: item_summary_chip_success.xml, _warning.xml, _error.xml
+  nếu bạn không muốn style bằng code.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_summary_chip"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingVertical="10dp">
+
+    <TextView
+        android:id="@+id/tvChipValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/status_success"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        tools:text="12" />
+
+    <TextView
+        android:id="@+id/tvChipLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="@string/admin_count_on_time"
+        android:textColor="@color/text_muted"
+        android:textSize="11sp" />
+
+</LinearLayout>

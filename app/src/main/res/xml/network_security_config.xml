@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chỉ mở cleartext HTTP cho đúng IP backend, không mở cho cả Internet.
+     Xoá file này + dòng android:networkSecurityConfig khi backend đã có HTTPS thật. -->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- TODO: đổi đúng IP máy chạy backend, khớp RetrofitClient.BASE_URL -->
+        <domain includeSubdomains="false">192.168.1.10</domain>
+    </domain-config>
+</network-security-config>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- App theme PHẢI kế thừa Theme.MaterialComponents.* vì layout dùng
+         MaterialCardView, MaterialButton, ShapeableImageView. -->
+    <style name="Theme.AppChamCong" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorPrimaryDark">@color/brand_primary_dark</item>
+        <item name="colorAccent">@color/brand_primary</item>
+    </style>
+
+    <!-- Dùng để bo tròn ImageView avatar trong item_staff_attendance.xml -->
+    <style name="CircleImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+</resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bắt buộc phải có: AndroidManifest.xml tham chiếu tới string này làm tên app -->
+    <string name="app_name">Chấm Công ESP32</string>
+
+    <!-- Tên hiển thị riêng cho từng icon trên màn hình máy (2 LAUNCHER activity) -->
+    <string name="launcher_label_employee">Chấm Công</string>
+    <string name="launcher_label_admin">Admin Chấm Công</string>
+
+    <!-- Admin screen -->
+    <string name="admin_header">QUẢN LÝ CHẤM CÔNG - ADMIN</string>
+    <string name="admin_shift_prefix">Ca làm việc:</string>
+    <string name="admin_status_auto_update">Đang cập nhật tự động…</string>
+    <string name="admin_staff_list_title">Danh sách nhân viên hôm nay</string>
+    <string name="admin_search_hint">Tìm theo tên nhân viên…</string>
+    <string name="admin_empty_title">Chưa có dữ liệu chấm công</string>
+    <string name="admin_empty_subtitle">Danh sách sẽ tự động cập nhật khi có nhân viên chấm công</string>
+    <string name="admin_count_on_time">Đúng giờ</string>
+    <string name="admin_count_late">Đi muộn</string>
+    <string name="admin_count_absent">Vắng mặt</string>
+
+    <!-- Staff item -->
+    <string name="staff_checkin_label">Vào: %1$s</string>
+    <string name="staff_checkout_label">Ra: %1$s</string>
+    <string name="staff_checkout_pending">Chưa chấm công ra</string>
+    <string name="staff_warning_late">⚠️ Chấm công muộn so với quy định</string>
+    <string name="cd_avatar">Ảnh đại diện nhân viên</string>
+    <string name="cd_status_ok">Trạng thái: hợp lệ</string>
+    <string name="cd_status_warning">Trạng thái: cảnh báo</string>
+
+    <!-- Employee check-in screen -->
+    <string name="employee_header">CHẤM CÔNG THÔNG MINH</string>
+    <string name="employee_welcome_prefix">Xin chào,</string>
+    <string name="employee_qr_title">Mã QR Chấm Công Cá Nhân</string>
+    <string name="employee_qr_subtitle">Dynamic QR – tự làm mới sau vài giây</string>
+    <string name="cd_qr_code">Mã QR chấm công cá nhân</string>
+    <string name="employee_qr_refresh_prefix">Mã làm mới sau:</string>
+    <string name="employee_status_not_checked_in">Bạn chưa chấm công hôm nay</string>
+    <string name="employee_status_checked_in">Đã chấm công vào lúc %1$s</string>
+    <string name="employee_btn_scan_gate">📷  Quét QR tại cổng</string>
+    <string name="employee_btn_scan_rfid">📶  Chạm thẻ RFID</string>
+</resources>

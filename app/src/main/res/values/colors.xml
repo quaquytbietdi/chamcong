@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_screen">#F5F6FA</color>
+    <color name="bg_screen_alt">#F8FAFC</color>
+    <color name="bg_avatar">#E2E8F0</color>
+    <color name="bg_qr_placeholder">#EDF2F7</color>
+
+    <color name="text_muted">#718096</color>
+    <color name="text_muted_light">#A0AEC0</color>
+    <color name="text_heading">#1A202C</color>
+    <color name="text_primary">#2D3748</color>
+    <color name="text_secondary">#4A5568</color>
+
+    <color name="status_success">#48BB78</color>
+    <color name="status_success_bg">#F0FFF4</color>
+    <color name="status_warning">#DD6B20</color>
+    <color name="status_warning_bg">#FFFAF0</color>
+    <color name="status_error">#E53E3E</color>
+    <color name="status_error_bg">#FFF5F5</color>
+
+    <color name="brand_primary">#3182CE</color>
+    <color name="brand_primary_dark">#2B6CB0</color>
+    <color name="white">#FFFFFF</color>
+    <color name="divider">#E2E8F0</color>
+</resources>
