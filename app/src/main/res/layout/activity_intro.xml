@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FA"
+    android:padding="24dp">
+
+    <!-- Logo / Biểu tượng ứng dụng ở trên cùng -->
+    <ImageView
+        android:id="@+id/imgIntroLogo"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="40dp"
+        android:contentDescription="Logo"
+        android:src="@drawable/intro_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Card chứa hình minh họa chibi nhân viên quét QR (Nằm ở giữa) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardChibi"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginVertical="20dp"
+        app:cardBackgroundColor="@android:color/white"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="4dp"
+        app:strokeWidth="0dp"
+        app:layout_constraintBottom_toTopOf="@id/tvIntroTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imgIntroLogo"
+        app:layout_constraintHeight_percent="0.5">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="Chibi Illustration"
+            android:scaleType="centerInside"
+            android:padding="16dp"
+            android:src="@drawable/img_chibi_scan" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Tiêu đề hệ thống (Đã chuyển xuống dưới ảnh) -->
+    <TextView
+        android:id="@+id/tvIntroTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="CHẤM CÔNG THÔNG MINH"
+        android:textColor="#1E293B"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/tvIntroSubtitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Mô tả chi tiết (Nằm dưới tiêu đề, cách đáy một khoảng vừa phải) -->
+    <TextView
+        android:id="@+id/tvIntroSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:text="Hệ thống quản lý nhân sự - Dynamic QR &amp; RFID"
+        android:textColor="#64748B"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

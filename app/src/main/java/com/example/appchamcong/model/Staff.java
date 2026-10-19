@@ -6,6 +6,7 @@ public class Staff {
 
     private String id;
     private String name;
+    private String gioChamCong; // Thêm trường lưu giờ chấm công dạng chuỗi "HH:mm"
     private Long checkInTimeMillis;
     private Long checkOutTimeMillis;
     private Status status;
@@ -23,12 +24,14 @@ public class Staff {
 
     public String getId() { return id; }
     public String getName() { return name; }
+    public String getGioChamCong() { return gioChamCong; }
     public Long getCheckInTimeMillis() { return checkInTimeMillis; }
     public Long getCheckOutTimeMillis() { return checkOutTimeMillis; }
     public Status getStatus() { return status; }
 
     public void setId(String id) { this.id = id; }
     public void setName(String name) { this.name = name; }
+    public void setGioChamCong(String gioChamCong) { this.gioChamCong = gioChamCong; }
     public void setCheckInTimeMillis(Long v) { this.checkInTimeMillis = v; }
     public void setCheckOutTimeMillis(Long v) { this.checkOutTimeMillis = v; }
     public void setStatus(Status status) { this.status = status; }

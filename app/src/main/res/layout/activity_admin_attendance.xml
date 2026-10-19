@@ -16,6 +16,80 @@
         android:paddingBottom="20dp">
 
         <!-- ==================== HEADER ==================== -->
+        <FrameLayout
+            android:id="@+id/staffListContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:minHeight="180dp"
+            android:paddingHorizontal="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTitleStaffList">
+
+            <!-- Danh sách nhân viên -->
+            <LinearLayout
+                android:id="@+id/layoutEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:alpha="0.4"
+                    android:contentDescription="@null"
+                    android:src="@android:drawable/ic_menu_my_calendar"
+                    app:tint="#64748B" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Không tìm thấy nhân viên"
+                    android:textColor="#1E293B"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="Thử thay đổi từ khóa tìm kiếm hoặc kiểm tra lại kết nối cơ sở dữ liệu."
+                    android:textColor="#64748B"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerStaffAttendance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
+                android:paddingBottom="16dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_staff_attendance" />
+
+            <!-- Loading -->
+            <ProgressBar
+                android:id="@+id/progressLoading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <!-- Empty state -->
+
+        </FrameLayout>
+
         <LinearLayout
             android:id="@+id/layoutAdminHeader"
             android:layout_width="0dp"
@@ -269,77 +343,6 @@
 
 
         <!-- ==================== KHU VỰC DANH SÁCH ==================== -->
-        <FrameLayout
-            android:id="@+id/staffListContainer"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:minHeight="180dp"
-            android:paddingHorizontal="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvTitleStaffList">
-
-            <!-- Danh sách nhân viên -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerStaffAttendance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:nestedScrollingEnabled="false"
-                android:paddingBottom="16dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/item_staff_attendance" />
-
-            <!-- Loading -->
-            <ProgressBar
-                android:id="@+id/progressLoading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                tools:visibility="visible" />
-
-            <!-- Empty state -->
-            <LinearLayout
-                android:id="@+id/layoutEmptyState"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:paddingHorizontal="16dp"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:alpha="0.4"
-                    android:contentDescription="@null"
-                    android:src="@android:drawable/ic_menu_my_calendar"
-                    app:tint="#64748B" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Không tìm thấy nhân viên"
-                    android:textColor="#1E293B"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center"
-                    android:text="Thử thay đổi từ khóa tìm kiếm hoặc kiểm tra lại kết nối cơ sở dữ liệu."
-                    android:textColor="#64748B"
-                    android:textSize="12sp" />
-
-            </LinearLayout>
-
-        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -3,6 +3,8 @@ package com.example.appchamcong.employee;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -24,6 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -34,6 +37,7 @@ public class EmployeeCheckInActivity extends AppCompatActivity {
     private static final int QR_SIZE_PX = 600;
     private static final long QR_VALIDITY_DURATION_MS = 30000L; // 30 giây
 
+    // Các thành phần UI
     private TextView tvEmployeeWelcome;
     private TextView tvTodayStatus;
     private ImageView imgDynamicQR;
@@ -44,15 +48,21 @@ public class EmployeeCheckInActivity extends AppCompatActivity {
     private MaterialButton btnScanPortalQR;
     private MaterialButton btnScanRfid;
 
+    // Các biến hiển thị Ngày & Giờ thời gian thực
+    private TextView tvDate;
+    private TextView tvClockTime;
+    private Handler timeHandler = new Handler(Looper.getMainLooper());
+    private Runnable timeRunnable;
+
     private DatabaseReference databaseReference;
     private FirebaseAuth mAuth;
     private CountDownTimer refreshTimer;
     private ValueEventListener checkinListener;
 
-    private String employeeId;
-
+    private String employeeId = "1"; // Mặc định ID số
+    private String employeeFullName = "Nhân viên";
     @Nullable
-    private Long checkedInAtMillis = null;
+    private String checkedInTimeStr = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,17 +76,14 @@ public class EmployeeCheckInActivity extends AppCompatActivity {
         updateTodayStatusUi();
 
         if (mAuth.getCurrentUser() != null) {
-            employeeId = mAuth.getCurrentUser().getUid();
-            loadEmployeeProfile(employeeId);
+            // Tra cứu ID số dựa trên Auth UID đã ánh xạ khi đăng ký
+            loadEmployeeShortId();
         } else {
-            employeeId = "unknown_user";
-            tvEmployeeWelcome.setText(getString(R.string.employee_welcome_prefix) + " Nhân viên");
+            tvEmployeeWelcome.setText("Xin chào, Nhân viên");
         }
 
-        // Nút giả lập quét thành công tại cổng (dùng để test thay cho ESP32-CAM)
-        btnScanPortalQR.setOnClickListener(v -> {
-            simulateCheckInSuccess();
-        });
+        // Nút giả lập quét thành công tại cổng (lưu vào AttendanceLogs/{ngay}/{id})
+        btnScanPortalQR.setOnClickListener(v -> simulateCheckInSuccess());
 
         btnScanRfid.setOnClickListener(v ->
                 Toast.makeText(this, "Đưa thẻ RFID lại gần để chấm công…", Toast.LENGTH_SHORT).show());
@@ -84,7 +91,7 @@ public class EmployeeCheckInActivity extends AppCompatActivity {
 
     private void bindViews() {
         tvEmployeeWelcome = findViewById(R.id.tvEmployeeWelcome);
-        tvTodayStatus = findViewById(R.id.tvTodayStatus);
+        tvTodayStatus = findViewById(R.id.tvTodayStatusBadge);
         imgDynamicQR = findViewById(R.id.imgDynamicQR);
         progressQrLoading = findViewById(R.id.progressQrLoading);
         tvQrError = findViewById(R.id.tvQrError);
@@ -92,13 +99,19 @@ public class EmployeeCheckInActivity extends AppCompatActivity {
         tvTimerCountdown = findViewById(R.id.tvTimerCountdown);
         btnScanPortalQR = findViewById(R.id.btnScanPortalQR);
         btnScanRfid = findViewById(R.id.btnScanRfid);
+
+        tvDate = findViewById(R.id.tvDate);
+        tvClockTime = findViewById(R.id.tvClockTime);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        listenCheckinStatusFromFirebase();
-        fetchNewTokenAndRender();
+        startRealTimeClock();
+        if (employeeId != null) {
+            listenCheckinStatusFromFirebase();
+            fetchNewTokenAndRender();
+        }
     }
 
     @Override
@@ -106,54 +119,105 @@ public class EmployeeCheckInActivity extends AppCompatActivity {
         super.onPause();
         if (refreshTimer != null) refreshTimer.cancel();
         if (checkinListener != null && employeeId != null) {
-            databaseReference.child("Users").child(employeeId).removeEventListener(checkinListener);
+            String dateKey = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+            databaseReference.child("AttendanceLogs").child(dateKey).child(employeeId).removeEventListener(checkinListener);
+        }
+        stopRealTimeClock();
+    }
+
+    private void startRealTimeClock() {
+        timeRunnable = new Runnable() {
+            @Override
+            public void run() {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd/MM/yyyy", new Locale("vi", "VN"));
+                String currentDate = dateFormat.format(new Date());
+
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                String currentTime = timeFormat.format(new Date());
+
+                if (tvDate != null) tvDate.setText(currentDate);
+                if (tvClockTime != null) tvClockTime.setText(currentTime);
+
+                timeHandler.postDelayed(this, 1000);
+            }
+        };
+        timeHandler.post(timeRunnable);
+    }
+
+    private void stopRealTimeClock() {
+        if (timeHandler != null && timeRunnable != null) {
+            timeHandler.removeCallbacks(timeRunnable);
         }
     }
 
-    private void loadEmployeeProfile(String uid) {
-        databaseReference.child("Users").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+    /** Tra cứu ID số (1, 2, 3...) từ Auth UID */
+    private void loadEmployeeShortId() {
+        String authUid = mAuth.getCurrentUser().getUid();
+        databaseReference.child("UserMapping").child(authUid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    String fullName = snapshot.child("fullname").getValue(String.class);
-                    if (fullName != null && !fullName.isEmpty()) {
-                        tvEmployeeWelcome.setText(getString(R.string.employee_welcome_prefix) + " " + fullName);
-                    } else {
-                        tvEmployeeWelcome.setText(getString(R.string.employee_welcome_prefix) + " Nhân viên");
-                    }
+                    employeeId = snapshot.getValue(String.class);
+                    loadEmployeeProfile(employeeId);
+                    listenCheckinStatusFromFirebase();
+                    fetchNewTokenAndRender();
                 } else {
-                    tvEmployeeWelcome.setText(getString(R.string.employee_welcome_prefix) + " Nhân viên");
+                    employeeId = "1";
+                    loadEmployeeProfile(employeeId);
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError error) {
-                tvEmployeeWelcome.setText(getString(R.string.employee_welcome_prefix) + " Nhân viên");
+                employeeId = "1";
+            }
+        });
+    }
+
+    private void loadEmployeeProfile(String id) {
+        databaseReference.child("Users").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String fullname = snapshot.child("fullname").getValue(String.class);
+                    if (fullname != null && !fullname.isEmpty()) {
+                        employeeFullName = fullname;
+                        tvEmployeeWelcome.setText("Xin chào, " + fullname);
+                    } else {
+                        tvEmployeeWelcome.setText("Xin chào, Nhân viên");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                tvEmployeeWelcome.setText("Xin chào, Nhân viên");
             }
         });
     }
 
     private void listenCheckinStatusFromFirebase() {
         if (employeeId == null) return;
-        DatabaseReference userRef = databaseReference.child("Users").child(employeeId);
+        String dateKey = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+        DatabaseReference logRef = databaseReference.child("AttendanceLogs").child(dateKey).child(employeeId);
 
         checkinListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                if (snapshot.exists() && snapshot.hasChild("checkedInMillis")) {
-                    checkedInAtMillis = snapshot.child("checkedInMillis").getValue(Long.class);
-                    updateTodayStatusUi();
+                if (snapshot.exists() && snapshot.hasChild("gioChamCong")) {
+                    checkedInTimeStr = snapshot.child("gioChamCong").getValue(String.class);
+                } else {
+                    checkedInTimeStr = null;
                 }
+                updateTodayStatusUi();
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
-            }
+            public void onCancelled(DatabaseError error) {}
         };
-        userRef.addValueEventListener(checkinListener);
+        logRef.addValueEventListener(checkinListener);
     }
 
-    /** Tạo và đồng bộ đầy đủ các thuộc tính QrTokens lên Firebase Realtime Database */
     private void fetchNewTokenAndRender() {
         showQrLoading(true);
 
@@ -201,8 +265,7 @@ public class EmployeeCheckInActivity extends AppCompatActivity {
             public void onTick(long millisUntilFinished) {
                 progressQRTimer.setProgress((int) millisUntilFinished);
                 int seconds = (int) Math.ceil(millisUntilFinished / 1000.0);
-                tvTimerCountdown.setText(
-                        getString(R.string.employee_qr_refresh_prefix) + " " + seconds + "s");
+                tvTimerCountdown.setText("Mã sẽ làm mới sau: " + seconds + "s");
             }
 
             @Override
@@ -213,23 +276,26 @@ public class EmployeeCheckInActivity extends AppCompatActivity {
         refreshTimer.start();
     }
 
-    // Hàm mô phỏng hành động quét cổng thành công (thay thế tạm thời cho ESP32-CAM)
+    // Mô phỏng chấm công: Lưu vào AttendanceLogs/{dd-MM-yyyy}/{id}
     private void simulateCheckInSuccess() {
         if (employeeId == null) return;
-        long checkInTime = System.currentTimeMillis();
 
-        DatabaseReference userRef = databaseReference.child("Users").child(employeeId);
-        Map<String, Object> updateData = new HashMap<>();
-        updateData.put("checkedInMillis", checkInTime);
-        updateData.put("status", "ON_TIME");
+        String dateKey = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+        String timeFormatted = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
 
-        userRef.updateChildren(updateData).addOnSuccessListener(aVoid -> {
-            checkedInAtMillis = checkInTime;
+        DatabaseReference logRef = databaseReference.child("AttendanceLogs")
+                .child(dateKey)
+                .child(employeeId);
+
+        Map<String, Object> checkInData = new HashMap<>();
+        checkInData.put("employeeName", employeeFullName);
+        checkInData.put("gioChamCong", timeFormatted);
+        checkInData.put("status", "Đã chấm công");
+
+        logRef.setValue(checkInData).addOnSuccessListener(aVoid -> {
+            checkedInTimeStr = timeFormatted;
             updateTodayStatusUi();
-
-            String timeFormatted = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(checkInTime);
             Toast.makeText(this, "Chấm công thành công lúc " + timeFormatted, Toast.LENGTH_LONG).show();
-
         }).addOnFailureListener(e -> {
             Toast.makeText(this, "Lỗi kết nối Firebase: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         });
@@ -245,12 +311,11 @@ public class EmployeeCheckInActivity extends AppCompatActivity {
     }
 
     private void updateTodayStatusUi() {
-        if (checkedInAtMillis == null) {
-            tvTodayStatus.setText(R.string.employee_status_not_checked_in);
+        if (checkedInTimeStr == null || checkedInTimeStr.isEmpty()) {
+            tvTodayStatus.setText("Chưa chấm");
             tvTodayStatus.setTextColor(ContextCompat.getColor(this, R.color.status_error));
         } else {
-            String time = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(checkedInAtMillis);
-            tvTodayStatus.setText(getString(R.string.employee_status_checked_in, time));
+            tvTodayStatus.setText(checkedInTimeStr);
             tvTodayStatus.setTextColor(ContextCompat.getColor(this, R.color.status_success));
         }
     }

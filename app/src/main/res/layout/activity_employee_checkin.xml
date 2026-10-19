@@ -1,208 +1,364 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_screen_alt"
-    android:paddingHorizontal="24dp">
+    android:background="#F8F9FA"
+    android:fillViewport="true">
 
-    <!-- Header thông tin nhân viên -->
-    <TextView
-        android:id="@+id/tvHeader"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:letterSpacing="0.04"
-        android:text="@string/employee_header"
-        android:textColor="@color/text_secondary"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:padding="20dp">
 
-    <TextView
-        android:id="@+id/tvEmployeeWelcome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="@string/employee_welcome_prefix"
-        android:textColor="@color/text_heading"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvHeader"
-        tools:text="Xin chào, Trần Thị B" />
+        <!-- 1. HEADER: Avatar, Lời chào & Ngày/Giờ -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardAvatar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:cardCornerRadius="25dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-    <!-- Trạng thái đã / chưa chấm công hôm hôm nay -->
-    <LinearLayout
-        android:id="@+id/layoutTodayStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/bg_status_pill"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="6dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvEmployeeWelcome">
-
-        <View
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:background="@drawable/dot_status_success" />
+            <ImageView
+                android:id="@+id/imgAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Avatar"
+                android:scaleType="centerCrop"
+                android:src="@drawable/img_intro_logo" />
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
-            android:id="@+id/tvTodayStatus"
+            android:id="@+id/tvEmployeeWelcome"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:text="Xin chào, Trần Thị B"
+            android:textColor="#1E293B"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/layoutDateTime"
+            app:layout_constraintStart_toEndOf="@id/cardAvatar"
+            app:layout_constraintTop_toTopOf="@id/cardAvatar" />
+
+        <TextView
+            android:id="@+id/tvUserSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:text="Chúc bạn một ngày làm việc hiệu quả!"
+            android:textColor="#64748B"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="@id/layoutDateTime"
+            app:layout_constraintStart_toEndOf="@id/cardAvatar"
+            app:layout_constraintTop_toBottomOf="@id/tvEmployeeWelcome" />
+
+        <!-- Hiển thị Ngày & Giờ thời gian thực góc phải -->
+        <LinearLayout
+            android:id="@+id/layoutDateTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:text="@string/employee_status_not_checked_in"
-            android:textColor="@color/status_success"
-            android:textSize="12sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <!-- Card chứa mã Dynamic QR -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardQr"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layoutTodayStatus"
-        app:layout_constraintWidth_max="280dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
+            android:gravity="end"
             android:orientation="vertical"
-            android:padding="20dp">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/tvDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/employee_qr_title"
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
+                android:text="Thứ 5, 24/04/2025"
+                android:textColor="#64748B"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvClockTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="12dp"
-                android:text="@string/employee_qr_subtitle"
-                android:textColor="@color/text_muted_light"
-                android:textSize="10sp" />
+                android:text="08:15"
+                android:textColor="#0F172A"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
-            <!-- Khung chứa QR -->
-            <FrameLayout
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:background="@color/bg_qr_placeholder">
+        <!-- 2. THẺ TÓM TẮT CHẤM CÔNG TUẦN NÀY (Đã thay thế phần thông tin cũ) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardWeeklySummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp"
+            app:layout_constraintTop_toBottomOf="@id/cardAvatar">
 
-                <ImageView
-                    android:id="@+id/imgDynamicQR"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Tiêu đề và icon lịch tuần -->
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/cd_qr_code"
-                    android:padding="12dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_launcher_foreground" />
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                <ProgressBar
-                    android:id="@+id/progressQrLoading"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_gravity="center"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_lock_placeholder" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Tóm tắt chấm công tuần này"
+                        android:textColor="#1E293B"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvWeekRange"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:text="Tuần này (Thứ 2 - CN)"
+                        android:textColor="#94A3B8"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <!-- 3 Cột thống kê nhanh (Số ngày công, Đi muộn, Trạng thái hôm nay) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
+
+                    <!-- Cột 1: Ngày công -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_rounded_input"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:id="@+id/tvWeeklyDaysCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="4 / 5"
+                            android:textColor="#2563EB"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Ngày công"
+                            android:textColor="#64748B"
+                            android:textSize="10sp" />
+                    </LinearLayout>
+
+                    <!-- Cột 2: Đi muộn -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/bg_rounded_input"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:id="@+id/tvWeeklyLateCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="#10B981"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Đi muộn"
+                            android:textColor="#64748B"
+                            android:textSize="10sp" />
+                    </LinearLayout>
+
+                    <!-- Cột 3: Trạng thái hôm nay -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_rounded_input"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:id="@+id/tvTodayStatusBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Chưa chấm"
+                            android:textColor="#DC2626"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Hôm nay"
+                            android:textColor="#64748B"
+                            android:textSize="10sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 3. MÃ QR ĐỘNG CÁ NHÂN (Vị trí trung tâm, kích thước lớn) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardQrContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp"
+            app:layout_constraintTop_toBottomOf="@id/cardWeeklySummary">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mã QR Chấm Công Cá Nhân"
+                    android:textColor="#1E293B"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="16dp"
+                    android:text="Dynamic QR – tự làm mới sau vài giây"
+                    android:textColor="#94A3B8"
+                    android:textSize="11sp" />
+
+                <!-- Khung ImageView chứa mã QR động (Cỡ lớn ở trung tâm) -->
+                <ImageView
+                    android:id="@+id/imgDynamicQR"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:contentDescription="Dynamic QR Code"
+                    android:scaleType="centerInside" />
+
+                <!-- TextView hiển thị lỗi nếu sinh QR thất bại -->
+                <TextView
                     android:id="@+id/tvQrError"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#CCFFFFFF"
-                    android:gravity="center"
-                    android:padding="16dp"
-                    android:text="Không tải được mã QR.\nKiểm tra kết nối mạng."
-                    android:textColor="@color/status_error"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="#DC2626"
                     android:textSize="12sp"
-                    android:visibility="gone"
-                    tools:visibility="gone" />
-            </FrameLayout>
+                    android:visibility="gone" />
 
-            <!-- Thanh đếm ngược thời gian làm mới QR -->
-            <ProgressBar
-                android:id="@+id/progressQRTimer"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="6dp"
-                android:layout_marginTop="16dp"
-                android:max="100"
-                android:progress="75"
-                android:progressTint="@color/brand_primary" />
+                <!-- ProgressBar loading QR -->
+                <ProgressBar
+                    android:id="@+id/progressQrLoading"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/tvTimerCountdown"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:textColor="@color/text_muted"
-                android:textSize="12sp"
-                tools:text="Mã làm mới sau: 08s" />
+                <!-- Thời gian đếm ngược làm mới mã -->
+                <TextView
+                    android:id="@+id/tvTimerCountdown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Mã sẽ làm mới sau: 30s"
+                    android:textColor="#64748B"
+                    android:textSize="12sp" />
+
+                <!-- Thanh tiến trình đếm ngược thời gian -->
+                <ProgressBar
+                    android:id="@+id/progressQRTimer"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_marginTop="8dp"
+                    android:max="100"
+                    android:progress="70"
+                    android:progressTint="#2563EB" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 4. HAI NÚT HÀNH ĐỘNG CHÍNH (Quét QR tại cổng & Chạm thẻ RFID) -->
+        <LinearLayout
+            android:id="@+id/layoutActionButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/cardQrContainer">
+
+            <Button
+                android:id="@+id/btnScanPortalQR"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#2563EB"
+                android:text="Quét QR tại cổng"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:cornerRadius="12dp" />
+
+            <Button
+                android:id="@+id/btnScanRfid"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="@android:color/white"
+                android:text="Chạm thẻ RFID"
+                android:textAllCaps="false"
+                android:textColor="#2563EB"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:cornerRadius="12dp"
+                app:strokeColor="#2563EB"
+                app:strokeWidth="1dp" />
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
 
-    <!-- Phương án chấm công dự phòng -->
-    <LinearLayout
-        android:id="@+id/layoutFallbackActions"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="24dp"
-        android:baselineAligned="false"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardQr">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnScanPortalQR"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginEnd="6dp"
-            android:layout_weight="1"
-            android:backgroundTint="@color/brand_primary"
-            android:text="@string/employee_btn_scan_gate"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="13sp"
-            app:cornerRadius="10dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnScanRfid"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginStart="6dp"
-            android:layout_weight="1"
-            android:text="@string/employee_btn_scan_rfid"
-            android:textAllCaps="false"
-            android:textColor="@color/brand_primary"
-            android:textSize="13sp"
-            app:cornerRadius="10dp"
-            app:strokeColor="@color/brand_primary" />
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

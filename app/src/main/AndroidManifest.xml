@@ -14,9 +14,9 @@
         android:theme="@style/Theme.AppChamCong"
         android:networkSecurityConfig="@xml/network_security_config">
 
-        <!-- MÀN HÌNH KHỞI CHẠY ĐẦU TIÊN (LoginActivity) -->
+        <!-- MÀN HÌNH INTRO GIỚI THIỆU (Khởi chạy đầu tiên khi mở app) -->
         <activity
-            android:name=".login.activity_login"
+            android:name=".login.IntroActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,12 +24,17 @@
             </intent-filter>
         </activity>
 
+        <!-- Màn hình Đăng nhập hệ thống (Chuyển sang sau khi Intro chạy xong) -->
+        <activity
+            android:name=".login.activity_login"
+            android:exported="false" />
+
         <!-- Màn hình Đăng ký tài khoản nhân viên -->
         <activity
             android:name=".login.activity_register"
             android:exported="false" />
 
-        <!-- Mành hình dành cho Nhân viên -->
+        <!-- Màn hình dành cho Nhân viên -->
         <activity
             android:name=".employee.EmployeeCheckInActivity"
             android:exported="false" />

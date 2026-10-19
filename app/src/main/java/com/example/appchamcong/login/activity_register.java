@@ -12,8 +12,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.appchamcong.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +36,7 @@ public class activity_register extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        // Ánh xạ đúng ID từ file XML bạn vừa gửi
+        // Ánh xạ đúng ID từ file XML
         edtRegFullname = findViewById(R.id.edtRegFullname);
         edtRegEmail = findViewById(R.id.edtRegEmail);
         edtRegPassword = findViewById(R.id.edtRegPassword);
@@ -62,26 +65,54 @@ public class activity_register extends AppCompatActivity {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        String uid = mAuth.getCurrentUser().getUid();
+                        String authUid = mAuth.getCurrentUser().getUid();
 
-                        // Đẩy đầy đủ các trường dữ liệu lên Realtime Database
-                        Map<String, Object> userObj = new HashMap<>();
-                        userObj.put("id", uid);
-                        userObj.put("fullname", fullname);
-                        userObj.put("email", email);
-                        userObj.put("role", "user");
-                        userObj.put("avatar", "");
+                        // Quét nhánh Users để tìm số thứ tự lớn nhất hiện tại, tránh bị ảnh hưởng bởi các chuỗi UID cũ
+                        mDatabase.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot snapshot) {
+                                int maxId = 0;
+                                for (DataSnapshot child : snapshot.getChildren()) {
+                                    try {
+                                        int idNum = Integer.parseInt(child.getKey());
+                                        if (idNum > maxId) {
+                                            maxId = idNum;
+                                        }
+                                    } catch (NumberFormatException e) {
+                                        // Bỏ qua các khóa không phải là số (như các chuỗi UID cũ nếu có)
+                                    }
+                                }
+                                int nextId = maxId + 1;
+                                String newIdString = String.valueOf(nextId);
 
-                        mDatabase.child("Users").child(uid).setValue(userObj)
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(activity_register.this, "Đăng ký thành công!", Toast.LENGTH_LONG).show();
-                                    mAuth.signOut();
-                                    finish();
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(activity_register.this, "Lỗi Realtime DB: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                                    Log.e("RegisterError", "Lỗi lưu Database: ", e);
-                                });
+                                Map<String, Object> userObj = new HashMap<>();
+                                userObj.put("id", newIdString);
+                                userObj.put("fullname", fullname);
+                                userObj.put("email", email);
+                                userObj.put("role", "user");
+
+                                // 1. Chỉ lưu thông tin vào nhánh Users/{id} (ví dụ: Users/3), TUYỆT ĐỐI KHÔNG LƯU theo Auth UID ở Users nữa
+                                mDatabase.child("Users").child(newIdString).setValue(userObj)
+                                        .addOnSuccessListener(aVoid -> {
+                                            // 2. Lưu ánh xạ ngầm Auth UID sang ID số ở nhánh UserMapping riêng biệt để app đối soát khi đăng nhập
+                                            mDatabase.child("UserMapping").child(authUid).setValue(newIdString)
+                                                    .addOnSuccessListener(aMapSuccess -> {
+                                                        Toast.makeText(activity_register.this, "Đăng ký thành công! Mã NV: " + newIdString, Toast.LENGTH_LONG).show();
+                                                        mAuth.signOut();
+                                                        finish();
+                                                    });
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(activity_register.this, "Lỗi Realtime DB: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                            Log.e("RegisterError", "Lỗi lưu Database: ", e);
+                                        });
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError error) {
+                                Toast.makeText(activity_register.this, "Lỗi hệ thống: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
 
                     } else {
                         Toast.makeText(activity_register.this, "Đăng ký thất bại: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();

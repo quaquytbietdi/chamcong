@@ -25,14 +25,16 @@ public class activity_login extends AppCompatActivity {
     private Button btnLogin;
     private TextView tvForgotPassword, tvRegister;
     private FirebaseAuth mAuth;
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Khởi tạo Firebase Auth
+        // Khởi tạo Firebase Auth và Database
         mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         // Ánh xạ các View từ file XML
         edtEmail = findViewById(R.id.edtEmail);
@@ -76,51 +78,46 @@ public class activity_login extends AppCompatActivity {
     private void checkUserRole() {
         if (mAuth.getCurrentUser() == null) return;
 
-        String uid = mAuth.getCurrentUser().getUid();
-        String email = mAuth.getCurrentUser().getEmail();
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid);
+        String authUid = mAuth.getCurrentUser().getUid();
 
-        userRef.get().addOnSuccessListener(snapshot -> {
-            if (snapshot.exists()) {
-                // Đã có dữ liệu trên Realtime Database, đọc trường "role" ra
-                String role = snapshot.child("role").getValue(String.class);
+        // 1. Tra cứu thông qua bảng UserMapping để lấy ra ID số (ví dụ: "1", "2", "3"...)
+        mDatabase.child("UserMapping").child(authUid).get().addOnSuccessListener(mappingSnapshot -> {
+            if (mappingSnapshot.exists()) {
+                String shortId = mappingSnapshot.getValue(String.class);
 
-                if ("admin".equals(role)) {
-                    // CHUYỂN SANG MÀN HÌNH ADMIN (QUẢN LÝ)
-                    Toast.makeText(this, "Đăng nhập thành công với quyền Quản lý (Admin)", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(activity_login.this, AdminAttendanceActivity.class);
-                    startActivity(intent);
-                } else {
-                    // CHUYỂN SANG MÀN HÌNH NHÂN VIÊN (EMPLOYEE)
-                    Toast.makeText(this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(activity_login.this, EmployeeCheckInActivity.class);
-                    startActivity(intent);
-                }
-                finish();
-            } else {
-                // Nếu tài khoản chưa có trên Database, tiến hành tạo mới
-                java.util.Map<String, Object> defaultUser = new java.util.HashMap<>();
-                defaultUser.put("email", email != null ? email : "");
+                // 2. Truy cập vào Users/{shortId} để đọc quyền "role"
+                mDatabase.child("Users").child(shortId).get().addOnSuccessListener(userSnapshot -> {
+                    if (userSnapshot.exists()) {
+                        String role = userSnapshot.child("role").getValue(String.class);
 
-                // Tạm thời để mặc định là "user".
-                // Nếu bạn muốn tài khoản cụ thể nào đó là Admin ngay khi tạo, bạn có thể chỉnh điều kiện ở đây.
-                defaultUser.put("role", "user");
-
-                userRef.setValue(defaultUser).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(activity_login.this, "Đã khởi tạo tài khoản nhân viên mới!", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(activity_login.this, EmployeeCheckInActivity.class);
-                        startActivity(intent);
+                        if ("admin".equals(role)) {
+                            // CHUYỂN SANG MÀN HÌNH ADMIN (QUẢN LÝ)
+                            Toast.makeText(this, "Đăng nhập thành công với quyền Quản lý (Admin)", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(activity_login.this, AdminAttendanceActivity.class);
+                            startActivity(intent);
+                        } else {
+                            // CHUYỂN SANG MÀN HÌNH NHÂN VIÊN (EMPLOYEE)
+                            Toast.makeText(this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(activity_login.this, EmployeeCheckInActivity.class);
+                            startActivity(intent);
+                        }
                         finish();
                     } else {
-                        Toast.makeText(activity_login.this, "Không thể khởi tạo dữ liệu phân quyền!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Không tìm thấy thông tin tài khoản trên hệ thống!", Toast.LENGTH_SHORT).show();
                     }
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi đọc dữ liệu người dùng: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+
+            } else {
+                // Trường hợp tài khoản cũ chưa có mapping, fallback về kiểm tra trực tiếp UID hoặc báo lỗi
+                Toast.makeText(this, "Tài khoản chưa được liên kết mã nhân viên!", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(e -> {
-            Toast.makeText(activity_login.this, "Lỗi kết nối: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Lỗi kết nối UserMapping: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         });
     }
+
     private void showForgotPasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Khôi phục mật khẩu");
